@@ -49,7 +49,14 @@ public class GZoltarFaultLocalizer implements IFaultLocalizer {
 			if (tr.wasSuccessful())
 				positiveTestMethods.add(testName);
 			else {
-				if (!tr.getName().startsWith("junit.framework"))
+				String trace = tr.getTrace();
+				if (trace.startsWith("java.lang.NoClassDefFoundError:")
+						|| trace.startsWith("java.lang.ExceptionInInitializerError")
+						|| trace.startsWith("java.lang.IllegalAccessError")
+						|| trace.startsWith("java.lang.VerifyError")) {
+					tr.setSuccessful(true);
+					positiveTestMethods.add(testName);
+				} else if (!tr.getName().startsWith("junit.framework"))
 					negativeTestMethods.add(testName);
 			}
 		}

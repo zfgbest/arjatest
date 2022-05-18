@@ -14,6 +14,18 @@ import us.msu.cse.repair.ec.problems.ArjaProblem;
 
 public class ArjaMain {
 	public static void main(String args[]) throws Exception {
+
+		args = new String[9];
+		args[0] = "Arja";
+		args[1] = "-DsrcJavaDir";
+		args[2] = "/home/bjtucs/workspace/apr/benchmarks/defects4j/time/time_15_buggy/src/main/java/";
+		args[3] = "-DbinJavaDir";
+		args[4] = "/home/bjtucs/workspace/apr/benchmarks/defects4j/time/time_15_buggy/build/classes/";
+		args[5] = "-DbinTestDir";
+		args[6] = "/home/bjtucs/workspace/apr/benchmarks/defects4j/time/time_15_buggy/build/tests/";
+		args[7] = "-Ddependences";
+		args[8] = "/home/bjtucs/program_files/defects4j/framework/projects/lib/junit-4.11.jar";
+
 		HashMap<String, String> parameterStrs = Interpreter.getParameterStrings(args);
 		HashMap<String, Object> parameters = Interpreter.getBasicParameterSetting(parameterStrs);
 
@@ -22,8 +34,8 @@ public class ArjaMain {
 			parameters.put("ingredientScreenerName", ingredientScreenerNameS);
 		
 		
-		int populationSize = 40;
-		int maxGenerations = 50;
+		int populationSize = 100;
+		int maxGenerations = 200;
 		
 		String populationSizeS = parameterStrs.get("populationSize");
 		if (populationSizeS != null)
