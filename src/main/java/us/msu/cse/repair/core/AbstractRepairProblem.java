@@ -144,7 +144,6 @@ public abstract class AbstractRepairProblem extends Problem {
 
 	protected static long launchTime;
 	protected static int evaluations;
-
 	
 
 	@SuppressWarnings("unchecked")

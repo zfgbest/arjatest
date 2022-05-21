@@ -6,7 +6,9 @@ import jmetal.operators.crossover.Crossover;
 import jmetal.operators.mutation.Mutation;
 import jmetal.operators.selection.Selection;
 import jmetal.operators.selection.SelectionFactory;
+import org.eclipse.core.internal.resources.Project;
 import us.msu.cse.repair.algorithms.arja.Arja;
+import us.msu.cse.repair.config.ProjectConfig;
 import us.msu.cse.repair.core.AbstractRepairAlgorithm;
 import us.msu.cse.repair.ec.operators.crossover.ExtendedCrossoverFactory;
 import us.msu.cse.repair.ec.operators.mutation.ExtendedMutationFactory;
@@ -15,14 +17,15 @@ import us.msu.cse.repair.ec.problems.ArjaProblem;
 public class ArjaMain {
 	public static void main(String args[]) throws Exception {
 
+		ProjectConfig config = ProjectConfig.getInstance(args[0]);
 		args = new String[9];
 		args[0] = "Arja";
 		args[1] = "-DsrcJavaDir";
-		args[2] = "/home/bjtucs/workspace/apr/benchmarks/defects4j/time/time_15_buggy/src/main/java/";
+		args[2] = config.getSrcJavaDir();
 		args[3] = "-DbinJavaDir";
-		args[4] = "/home/bjtucs/workspace/apr/benchmarks/defects4j/time/time_15_buggy/build/classes/";
+		args[4] = config.getBinJavaDir();
 		args[5] = "-DbinTestDir";
-		args[6] = "/home/bjtucs/workspace/apr/benchmarks/defects4j/time/time_15_buggy/build/tests/";
+		args[6] = config.getBinTestDir();
 		args[7] = "-Ddependences";
 		args[8] = "/home/bjtucs/program_files/defects4j/framework/projects/lib/junit-4.11.jar";
 
@@ -34,8 +37,8 @@ public class ArjaMain {
 			parameters.put("ingredientScreenerName", ingredientScreenerNameS);
 		
 		
-		int populationSize = 100;
-		int maxGenerations = 200;
+		int populationSize = 80;
+		int maxGenerations = 100;
 		
 		String populationSizeS = parameterStrs.get("populationSize");
 		if (populationSizeS != null)
@@ -77,4 +80,5 @@ public class ArjaMain {
 		
 		repairAlg.execute();
 	}
+
 }
