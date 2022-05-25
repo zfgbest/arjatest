@@ -189,6 +189,8 @@ public abstract class AbstractRepairProblem extends Problem {
 		patchOutputRoot = (String) parameters.get("patchOutputRoot");
 		if (patchOutputRoot == null)
 			patchOutputRoot = "patches_" + id;
+		else
+			patchOutputRoot = patchOutputRoot + "_" + id;
 		
 		orgPosTestsInfoPath = (String) parameters.get("orgPosTestsInfoPath");
 		if (orgPosTestsInfoPath == null)

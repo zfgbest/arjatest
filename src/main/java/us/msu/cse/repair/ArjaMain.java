@@ -16,9 +16,10 @@ import us.msu.cse.repair.ec.problems.ArjaProblem;
 
 public class ArjaMain {
 	public static void main(String args[]) throws Exception {
-
-		ProjectConfig config = ProjectConfig.getInstance(args[0]);
-		args = new String[9];
+		String bugID = args[0];
+		assert bugID != null;
+		ProjectConfig config = ProjectConfig.getInstance(bugID);
+		args = new String[11];
 		args[0] = "Arja";
 		args[1] = "-DsrcJavaDir";
 		args[2] = config.getSrcJavaDir();
@@ -28,6 +29,9 @@ public class ArjaMain {
 		args[6] = config.getBinTestDir();
 		args[7] = "-Ddependences";
 		args[8] = "/home/bjtucs/program_files/defects4j/framework/projects/lib/junit-4.11.jar";
+
+		args[9] = "-DpatchOutputRoot";
+		args[10] = "patches_" + bugID;
 
 		HashMap<String, String> parameterStrs = Interpreter.getParameterStrings(args);
 		HashMap<String, Object> parameters = Interpreter.getBasicParameterSetting(parameterStrs);
