@@ -100,6 +100,12 @@ public abstract class AbstractRepairProblem extends Problem {
 	protected String orgPosTestsInfoPath;
 	protected String finalTestsInfoPath;
 
+	// added by wb
+	protected String subject;
+	protected int id;
+	protected String rootDir;
+
+
 	protected String srcJavaDir;
 
 	protected String binJavaDir;
@@ -136,7 +142,9 @@ public abstract class AbstractRepairProblem extends Problem {
 	protected List<String> compilerOptions;
 
 	protected URL[] progURLs;
-	
+
+	protected boolean usePerfectLocation = false;
+	protected boolean useGzoltar = true;
 	protected String gzoltarDataDir;
 
 	protected static int globalID;
@@ -152,7 +160,11 @@ public abstract class AbstractRepairProblem extends Problem {
 		binTestDir = (String) parameters.get("binTestDir");
 		srcJavaDir = (String) parameters.get("srcJavaDir");
 		dependences = (Set<String>) parameters.get("dependences");
-		
+
+		subject = (String) parameters.get("subject");
+		id = Integer.valueOf((String) parameters.get("id"));
+		rootDir = (String) parameters.get("rootDir");
+
 		binExecuteTestClasses = (Set<String>) parameters.get("tests");
 
 		percentage = (Double) parameters.get("percentage");
@@ -161,9 +173,17 @@ public abstract class AbstractRepairProblem extends Problem {
 		testClassesInfoPath = (String) parameters.get("testClassesInfoPath");
 		
 		faultyLinesInfoPath = (String) parameters.get("faultyLinesInfoPath");
-	
+
+		if(parameters.get("useGzoltar") != null) {
+			useGzoltar = Boolean.valueOf((String) parameters.get("useGzoltar"));
+		}
 		gzoltarDataDir = (String) parameters.get("gzoltarDataDir");
-		
+
+		if(parameters.get("usePerfectLocation") != null) {
+			usePerfectLocation = Boolean.valueOf((String) parameters.get("usePerfectLocation"));
+		}
+
+
 		String id = Helper.getRandomID();
 		
 		thr = (Double) parameters.get("thr");
@@ -299,11 +319,17 @@ public abstract class AbstractRepairProblem extends Problem {
 	void invokeFaultLocalizer() throws FileNotFoundException, IOException {
 		System.out.println("Fault localization starts...");
 		IFaultLocalizer faultLocalizer;
-		if (gzoltarDataDir == null)
-			faultLocalizer = new GZoltarFaultLocalizer(binJavaClasses, binExecuteTestClasses, binJavaDir, binTestDir,
-					dependences);
-		else
-			faultLocalizer = new GZoltarFaultLocalizer2(gzoltarDataDir);
+		if(useGzoltar) {
+			if (gzoltarDataDir == null)
+				faultLocalizer = new GZoltarFaultLocalizer(binJavaClasses, binExecuteTestClasses, binJavaDir, binTestDir,
+						dependences);
+			else {
+				faultLocalizer = new GZoltarFaultLocalizer2(gzoltarDataDir);
+			}
+		} else {
+			faultLocalizer = new ReaderLocalizer(subject, id, rootDir, usePerfectLocation);
+		}
+
 
 		faultyLines = faultLocalizer.searchSuspicious(thr);
 

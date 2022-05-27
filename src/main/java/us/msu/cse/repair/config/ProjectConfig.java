@@ -3,6 +3,7 @@ package us.msu.cse.repair.config;
 import us.msu.cse.repair.core.util.visitors.CMD;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,20 +11,44 @@ import java.util.List;
 import java.util.Locale;
 
 public class ProjectConfig {
-    /** such as `chart_3`  */
+    /** such as `chart_3` */
     private String bugName;
 
+    /** such as `chart` */
+    private String subject;
+    /** such as `3` */
+    private int id;
+
     private String rootDir;
+    private File rootFile;
     private String srcJavaDir;
     private String binJavaDir;
     private String binTestDir;
 
     public ProjectConfig(String bugName, String rootDir, String srcJavaDir, String binJavaDir, String binTestDir) {
+        assert bugName.indexOf('_') >= 0;
+        assert Character.isLowerCase(bugName.charAt(0));
         this.bugName = bugName;
+
+        String[] arr = bugName.split("_");
+        this.subject = arr[0];
+        this.id = Integer.valueOf(arr[1]);
+
         this.rootDir = rootDir;
+        this.rootFile = new File(rootDir);
+        assert rootFile.exists();
+
         this.srcJavaDir = srcJavaDir;
         this.binJavaDir = binJavaDir;
         this.binTestDir = binTestDir;
+
+
+        File allTestFile = new File(this.getRootDir() + "/all-tests.txt");
+        File failingTestFile = new File(this.getRootDir() + "/failing_tests");
+        if(!allTestFile.exists() || !failingTestFile.exists()) {
+            this.d4jCompile();
+            this.d4jTest();
+        }
     }
 
     public String getBugName() {
@@ -40,6 +65,14 @@ public class ProjectConfig {
 
     public void setRootDir(String rootDir) {
         this.rootDir = rootDir;
+    }
+
+    public File getRootFile() {
+        return rootFile;
+    }
+
+    public void setRootFile(File rootFile) {
+        this.rootFile = rootFile;
     }
 
     public String getSrcJavaDir() {
@@ -66,6 +99,59 @@ public class ProjectConfig {
         this.binTestDir = binTestDir;
     }
 
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void d4jCompile(){
+        try {
+            List<String> params = new ArrayList<>();
+            params.add("defects4j");
+            params.add("compile");
+            CMD.run(params, this.rootFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void d4jTest() {
+        try {
+            List<String> params = new ArrayList<>();
+            params.add("defects4j");
+            params.add("test");
+            CMD.run(params, this.rootFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void cleanD4jOutput(){
+        File allTestFile = new File(this.rootDir + "/all-tests.txt");
+        if(allTestFile.exists()) {
+            allTestFile.delete();
+        }
+        File failingTestFile = new File(this.rootDir + "/failing_tests");
+        if(failingTestFile.exists()) {
+            failingTestFile.delete();
+        }
+    }
+
     @Override
     public String toString() {
         return "ProjectConfig{" +
@@ -75,6 +161,24 @@ public class ProjectConfig {
                 "\n binJavaDir='" + binJavaDir + '\'' +
                 "\n binTestDir='" + binTestDir + '\'' +
                 "\n}";
+    }
+
+    public String getDependencies(){
+        if(!subject.equalsIgnoreCase("closure")) {
+            return "/home/bjtucs/program_files/defects4j/framework/projects/lib/junit-4.11.jar";
+        }
+        File libFile = new File(this.rootDir + "/lib");
+        FilenameFilter filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".jar");
+            }
+        };
+        String clsPath = new File(this.rootDir + "/build/lib/rhino.jar").getAbsolutePath();
+        for(File file: libFile.listFiles(filter)) {
+            clsPath += ":" + file.getAbsolutePath();
+        }
+        return clsPath;
     }
 
     public static ProjectConfig getInstance(String bugID) {
@@ -149,10 +253,10 @@ public class ProjectConfig {
         File binFile = new File(binJavaDir);
         File testBinFile = new File(binTestDir);
         if(!binFile.exists() || !testBinFile.exists()) {
-            List<String> params = new ArrayList<>();
-            params.add("defects4j");
-            params.add("compile");
             try {
+                List<String> params = new ArrayList<>();
+                params.add("defects4j");
+                params.add("compile");
                 CMD.run(params, rootFile);
             } catch (IOException e) {
                 throw new RuntimeException(e);

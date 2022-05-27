@@ -1,12 +1,10 @@
 package us.msu.cse.repair;
 
-import java.util.HashMap;
-
 import jmetal.operators.crossover.Crossover;
 import jmetal.operators.mutation.Mutation;
 import jmetal.operators.selection.Selection;
 import jmetal.operators.selection.SelectionFactory;
-import org.eclipse.core.internal.resources.Project;
+import org.eclipse.core.internal.resources.File;
 import us.msu.cse.repair.algorithms.arja.Arja;
 import us.msu.cse.repair.config.ProjectConfig;
 import us.msu.cse.repair.core.AbstractRepairAlgorithm;
@@ -14,10 +12,13 @@ import us.msu.cse.repair.ec.operators.crossover.ExtendedCrossoverFactory;
 import us.msu.cse.repair.ec.operators.mutation.ExtendedMutationFactory;
 import us.msu.cse.repair.ec.problems.ArjaProblem;
 
+import java.util.HashMap;
+
 public class ArjaMain {
 	public static void main(String args[]) throws Exception {
 		String bugID = args[0];
 		assert bugID != null;
+		System.out.println("Fixing " + bugID);
 		ProjectConfig config = ProjectConfig.getInstance(bugID);
 		args = new String[11];
 		args[0] = "Arja";
@@ -28,7 +29,7 @@ public class ArjaMain {
 		args[5] = "-DbinTestDir";
 		args[6] = config.getBinTestDir();
 		args[7] = "-Ddependences";
-		args[8] = "/home/bjtucs/program_files/defects4j/framework/projects/lib/junit-4.11.jar";
+		args[8] = config.getDependencies();
 
 		args[9] = "-DpatchOutputRoot";
 		args[10] = "patches_" + bugID;
@@ -36,11 +37,20 @@ public class ArjaMain {
 		HashMap<String, String> parameterStrs = Interpreter.getParameterStrings(args);
 		HashMap<String, Object> parameters = Interpreter.getBasicParameterSetting(parameterStrs);
 
+		// added by wb
+		parameters.put("subject", config.getSubject());
+		parameters.put("id", Integer.toString(config.getId()));
+		parameters.put("rootDir", config.getRootDir());
+		if(config.getSubject().equalsIgnoreCase("closure")) {
+			parameters.put("useGzoltar", Boolean.toString(false));
+		}
+
+
 		String ingredientScreenerNameS = parameterStrs.get("ingredientScreenerName");
 		if (ingredientScreenerNameS != null) 
 			parameters.put("ingredientScreenerName", ingredientScreenerNameS);
-		
-		
+
+
 		int populationSize = 80;
 		int maxGenerations = 100;
 		
@@ -51,7 +61,7 @@ public class ArjaMain {
 		String maxGenerationsS = parameterStrs.get("maxGenerations");
 		if (maxGenerationsS != null)
 			maxGenerations = Integer.parseInt(maxGenerationsS);
-		
+
 		
 		ArjaProblem problem = new ArjaProblem(parameters);
 		AbstractRepairAlgorithm repairAlg = new Arja(problem);
