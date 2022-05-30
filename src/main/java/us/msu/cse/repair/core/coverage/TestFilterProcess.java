@@ -18,6 +18,8 @@ public class TestFilterProcess {
 	Set<String> orgPositiveTests;
 	String orgPosTestsInfoPath;
 
+	Set<String> orgNegativeTest;
+
 	String binJavaDir;
 	String binTestDir;
 	Set<String> dependences;
@@ -28,13 +30,16 @@ public class TestFilterProcess {
 	
 
 	public TestFilterProcess(Set<LCNode> faultyLines, String faultyLinesInfoPath, Set<String> orgPositiveTests,
-			String orgPosTestsInfoPath, String binJavaDir, String binTestDir, Set<String> dependences,
-			String externalProjRoot, String jvmPath) {
+							 String orgPosTestsInfoPath, Set<String> orgNegativeTest,
+							 String binJavaDir, String binTestDir, Set<String> dependences,
+							 String externalProjRoot, String jvmPath) {
 		this.faultyLines = faultyLines;
 		this.faultyLinesInfoPath = faultyLinesInfoPath;
 
 		this.orgPositiveTests = orgPositiveTests;
 		this.orgPosTestsInfoPath = orgPosTestsInfoPath;
+
+		this.orgNegativeTest = orgNegativeTest;
 
 		this.binJavaDir = binJavaDir;
 		this.binTestDir = binTestDir;
@@ -91,6 +96,13 @@ public class TestFilterProcess {
 			for (String test : orgPositiveTests)
 				opts += (test + File.pathSeparator);
 			params.add(opts);
+		}
+
+		if(binJavaDir.contains("closure")) {
+			String failTest = "";
+			for (String test : orgNegativeTest)
+				failTest += (test + File.pathSeparator);
+			params.add(failTest);
 		}
 
 		ProcessBuilder builder = new ProcessBuilder(params);

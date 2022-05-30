@@ -495,8 +495,8 @@ public abstract class AbstractRepairProblem extends Problem {
 				FileUtils.writeLines(new File(faultyLinesInfoPath), lines);
 			}
 
-			TestFilterProcess tfp = new TestFilterProcess(fLines, faultyLinesInfoPath, positiveTests,
-					orgPosTestsInfoPath, binJavaDir, binTestDir, dependences, externalProjRoot, jvmPath);
+			TestFilterProcess tfp = new TestFilterProcess(fLines, faultyLinesInfoPath, positiveTests, orgPosTestsInfoPath,
+					negativeTests, binJavaDir, binTestDir, dependences, externalProjRoot, jvmPath);
 			positiveTests = tfp.getFilteredPositiveTests();
 		}
 

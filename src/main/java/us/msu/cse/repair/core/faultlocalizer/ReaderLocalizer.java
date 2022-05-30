@@ -57,7 +57,7 @@ public class ReaderLocalizer implements IFaultLocalizer{
                 String[] arr = line.split("\\(");
                 String testMtd = arr[0];
                 String testCls = arr[1].substring(0, arr[1].length() - 1); // remove the last `)`
-                positiveTestMethods.add(testMtd + "#" + testCls);
+                positiveTestMethods.add(testCls + "#" + testMtd);
             }
             assert !positiveTestMethods.isEmpty();
             for(String line: failingTestLines) {
