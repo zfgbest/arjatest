@@ -53,6 +53,9 @@ public class TestFilterProcess {
 	public Set<String> getFilteredPositiveTests() throws IOException, InterruptedException {
 		List<String> params = new ArrayList<String>();
 		params.add(jvmPath);
+		params.add("-XX:PermSize=256M");
+		params.add("-XX:MaxPermSize=2G");
+
 		params.add("-cp");
 
 		File jarDir = new File(externalProjRoot, "lib/*");
