@@ -25,15 +25,22 @@ public class ProjectConfig {
     private String binJavaDir;
     private String binTestDir;
 
+    private File allTestFile;
+    private File failingTestFile;
+
     public ProjectConfig(String bugName, String rootDir, String srcJavaDir, String binJavaDir, String binTestDir) {
+        assert bugName != null;
         assert bugName.indexOf('_') >= 0;
         assert Character.isLowerCase(bugName.charAt(0));
-        this.bugName = bugName;
+        assert rootDir != null;
+        assert srcJavaDir != null;
+        assert binJavaDir != null;
+        assert binTestDir != null;
 
+        this.bugName = bugName;
         String[] arr = bugName.split("_");
         this.subject = arr[0];
         this.id = Integer.valueOf(arr[1]);
-
         this.rootDir = rootDir;
         this.rootFile = new File(rootDir);
         assert rootFile.exists();
@@ -42,12 +49,17 @@ public class ProjectConfig {
         this.binJavaDir = binJavaDir;
         this.binTestDir = binTestDir;
 
-
-        File allTestFile = new File(this.getRootDir() + "/all-tests.txt");
-        File failingTestFile = new File(this.getRootDir() + "/failing_tests");
+        if(System.getProperty("os.name").toLowerCase().contains("linux")) {
+            allTestFile = new File(this.rootDir + "/all-tests.txt");
+        } else {
+            allTestFile = new File(this.rootDir + "/all_tests");
+        }
+        failingTestFile = new File(this.getRootDir() + "/failing_tests");
         if(!allTestFile.exists() || !failingTestFile.exists()) {
             this.d4jCompile();
             this.d4jTest();
+            assert allTestFile.exists();
+            assert failingTestFile.exists();
         }
     }
 
@@ -142,11 +154,9 @@ public class ProjectConfig {
     }
 
     public void cleanD4jOutput(){
-        File allTestFile = new File(this.rootDir + "/all-tests.txt");
         if(allTestFile.exists()) {
             allTestFile.delete();
         }
-        File failingTestFile = new File(this.rootDir + "/failing_tests");
         if(failingTestFile.exists()) {
             failingTestFile.delete();
         }

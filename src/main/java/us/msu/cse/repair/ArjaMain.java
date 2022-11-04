@@ -45,7 +45,6 @@ public class ArjaMain {
 			parameters.put("useGzoltar", Boolean.toString(false));
 		}
 
-
 		String ingredientScreenerNameS = parameterStrs.get("ingredientScreenerName");
 		if (ingredientScreenerNameS != null) 
 			parameters.put("ingredientScreenerName", ingredientScreenerNameS);

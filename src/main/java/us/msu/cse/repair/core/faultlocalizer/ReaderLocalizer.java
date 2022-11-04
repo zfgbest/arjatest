@@ -40,8 +40,14 @@ public class ReaderLocalizer implements IFaultLocalizer{
             throw new RuntimeException(e);
         }
 
+        File allTestFile;
+        if(System.getProperty("os.name").toLowerCase().contains("linux")) {
+            allTestFile = new File(rootDir + "/all-tests.txt");
+        } else {
+            allTestFile = new File(rootDir + "/all_tests");
+        }
+
         // adding `positiveTestMethods` and `negativeTestMethods`
-        File allTestFile = new File(rootDir + "/all-tests.txt");
         File failingTestFile = new File(rootDir + "/failing_tests");
         assert allTestFile.exists() && failingTestFile.exists();
         positiveTestMethods = new HashSet<String>();
