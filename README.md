@@ -53,7 +53,7 @@ be used. Moreover, at least four parameters related with the buggy program are r
 
 In the above command, "path_to_directory_of_src_buggy" etc should be replaced with the actual 
 absolute paths (the tool currently only supports absolute paths). All the test-suite adequate
-patches found by the approach are saved in the directory arja/patches_$id$ by default. $id$ is a randomly 
+patches found by the approach are saved in the directory arja/patches_$bugid$_$id$ by default. $bugid$ is the name of the bug (e.g., math_1), and $id$ is a randomly 
 generated string containing four characters. 
 
 

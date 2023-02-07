@@ -11,6 +11,23 @@ import java.util.List;
 import java.util.Locale;
 
 public class ProjectConfig {
+
+    public static String DEFECTS4J_HOME = "";
+    static {
+        try {
+            List<String> res = CMD.run(Arrays.asList("which", "defects4j"), new File("."));
+            assert res.size() == 1;
+            DEFECTS4J_HOME = res.get(0);
+            assert DEFECTS4J_HOME.contains("defects4j");
+            int start = DEFECTS4J_HOME.indexOf("defects4j");
+            DEFECTS4J_HOME = DEFECTS4J_HOME.substring(0, start) + "defects4j/";
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /** such as `chart_3` */
     private String bugName;
 

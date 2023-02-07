@@ -27,8 +27,10 @@ public class TestFilterProcess {
 	String externalProjRoot;
 
 	String jvmPath;
-	
 
+	/**
+	 * @param orgNegativeTest This param is added by wb, to enable read FL
+	 */
 	public TestFilterProcess(Set<LCNode> faultyLines, String faultyLinesInfoPath, Set<String> orgPositiveTests,
 							 String orgPosTestsInfoPath, Set<String> orgNegativeTest,
 							 String binJavaDir, String binTestDir, Set<String> dependences,
@@ -92,21 +94,29 @@ public class TestFilterProcess {
 			params.add(fls);
 		}
 
-		if (orgPosTestsInfoPath != null)
-			params.add("@" + orgPosTestsInfoPath);
-		else {
+		if (orgPosTestsInfoPath != null) { // the file contains all positive tests
+            params.add("@" + orgPosTestsInfoPath);
+        } else {
 			String opts = "";
 			for (String test : orgPositiveTests)
 				opts += (test + File.pathSeparator);
 			params.add(opts);
 		}
 
-		if(binJavaDir.contains("closure")) {
-			String failTest = "";
-			for (String test : orgNegativeTest)
-				failTest += (test + File.pathSeparator);
-			params.add(failTest);
+//		// add for read FL
+//		if(binJavaDir.contains("closure")) {
+//			String failTest = "";
+//			for (String test : orgNegativeTest)
+//				failTest += (test + File.pathSeparator);
+//			params.add(failTest);
+//		}
+
+		System.out.println("------------------------------");
+		for (String s : params) {
+			System.out.print(s);
+			System.out.print(' ');
 		}
+		System.out.println("\n------------------------------");
 
 		ProcessBuilder builder = new ProcessBuilder(params);
 		builder.redirectOutput();

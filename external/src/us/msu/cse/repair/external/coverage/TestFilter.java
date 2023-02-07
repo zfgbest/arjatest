@@ -23,7 +23,9 @@ import org.junit.runner.Request;
 import us.msu.cse.repair.external.util.Util;
 
 
-
+/**
+ * This class employs jacoco to instrument and trace source.
+ */
 public class TestFilter {
 	private static String binJavaDir;
 	private static String binTestDir;
@@ -32,6 +34,7 @@ public class TestFilter {
 	private static Set<LCNode> faultyLines;
 	private static Set<String> orgPositiveTests;
 	private static Set<String> faultyClasses;
+
 	public static void main(String args[]) throws Exception  {
 		binJavaDir = args[0].trim();
 		binTestDir = args[1].trim();
@@ -98,7 +101,7 @@ public class TestFilter {
 
 	private static boolean canFiltered(String test)
 			throws Exception {
-		System.out.println(">>>> " + test);
+		System.out.println(">>>> TestFilter.canFiltered >>>> " + test);
 		final MemoryClassLoader loader = new MemoryClassLoader(Util.getURLs(binJavaDir, binTestDir, dependences));
 		
 		final IRuntime runtime = new LoggerRuntime();
@@ -127,7 +130,6 @@ public class TestFilter {
 		final CoverageBuilder coverageBuilder = new CoverageBuilder();
 		final Analyzer analyzer = new Analyzer(executionData, coverageBuilder);
 
-		
 		for (String binJavaClass : faultyClasses) {
 			InputStream istream = Util.getTargetClass(binJavaDir, binJavaClass);
 			analyzer.analyzeClass(istream, binJavaClass);

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -16,7 +17,7 @@ import com.gzoltar.core.instr.testing.TestResult;
 
 import us.msu.cse.repair.core.parser.LCNode;
 
-public class GZoltarFaultLocalizer implements IFaultLocalizer {
+public class GZoltarFaultLocalizer implements IFaultLocalizer, Serializable {
 	Set<String> positiveTestMethods;
 	Set<String> negativeTestMethods;
 
@@ -24,6 +25,7 @@ public class GZoltarFaultLocalizer implements IFaultLocalizer {
 
 	public GZoltarFaultLocalizer(Set<String> binJavaClasses, Set<String> binExecuteTestClasses, String binJavaDir,
 			String binTestDir, Set<String> dependences) throws FileNotFoundException, IOException {
+
 		String projLoc = new File("").getAbsolutePath();
 		GZoltar gz = new GZoltar(projLoc);
 
@@ -75,7 +77,6 @@ public class GZoltarFaultLocalizer implements IFaultLocalizer {
 
 	@Override
 	public Map<LCNode, Double> searchSuspicious(double thr) {
-		// TODO Auto-generated method stub
 		Map<LCNode, Double> partFaultyLines = new HashMap<LCNode, Double>();
 		for (Map.Entry<LCNode, Double> entry : faultyLines.entrySet()) {
 			if (entry.getValue() >= thr)
@@ -86,13 +87,11 @@ public class GZoltarFaultLocalizer implements IFaultLocalizer {
 
 	@Override
 	public Set<String> getPositiveTests() {
-		// TODO Auto-generated method stub
 		return this.positiveTestMethods;
 	}
 
 	@Override
 	public Set<String> getNegativeTests() {
-		// TODO Auto-generated method stub
 		return this.negativeTestMethods;
 	}
 }

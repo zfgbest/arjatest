@@ -176,7 +176,6 @@ public class ArjaProblem extends AbstractRepairProblem {
 			try {
 				status = invokeTestExecutor(compiledClasses, solution);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else {
@@ -224,7 +223,6 @@ public class ArjaProblem extends AbstractRepairProblem {
 				globalID++;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

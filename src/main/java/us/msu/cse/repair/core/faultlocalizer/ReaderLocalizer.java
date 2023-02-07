@@ -3,6 +3,7 @@ package us.msu.cse.repair.core.faultlocalizer;
 import org.apache.commons.io.FileUtils;
 import us.msu.cse.repair.config.ProjectConfig;
 import us.msu.cse.repair.core.parser.LCNode;
+import us.msu.cse.repair.core.util.visitors.CMD;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,13 +11,22 @@ import java.util.*;
 
 public class ReaderLocalizer implements IFaultLocalizer{
 
-    Set<String> positiveTestMethods;
-    Set<String> negativeTestMethods;
+    private String subject;
 
-    Map<LCNode, Double> faultyLines;
+    private String id;
 
-    public ReaderLocalizer(String subject, int id, String rootDir, boolean manual){
-        String str = manual ? "manual" : "ochiai";
+    private boolean isManual;
+
+    private Set<String> positiveTestMethods;
+    private Set<String> negativeTestMethods;
+
+    private Map<LCNode, Double> faultyLines;
+
+    public ReaderLocalizer(String subject, int id, String rootDir, boolean isManual){
+        this.subject = subject;
+        this.id = Integer.toString(id);
+        this.isManual = isManual;
+        String str = isManual ? "manual" : "ochiai";
         System.out.println("Loading " + str + " FL data...");
         File suspiciousFile = new File("location/" + str + "/" + subject + "/" + id + ".txt");
         assert suspiciousFile.exists(): "FILE DOES NOT EXIST: " + suspiciousFile.getAbsolutePath();
@@ -41,11 +51,12 @@ public class ReaderLocalizer implements IFaultLocalizer{
         }
 
         File allTestFile;
-        if(System.getProperty("os.name").toLowerCase().contains("linux")) {
+        if (System.getProperty("os.name").toLowerCase().contains("linux")) {
             allTestFile = new File(rootDir + "/all-tests.txt");
         } else {
             allTestFile = new File(rootDir + "/all_tests");
         }
+
 
         // adding `positiveTestMethods` and `negativeTestMethods`
         File failingTestFile = new File(rootDir + "/failing_tests");
@@ -63,6 +74,7 @@ public class ReaderLocalizer implements IFaultLocalizer{
                 String[] arr = line.split("\\(");
                 String testMtd = arr[0];
                 String testCls = arr[1].substring(0, arr[1].length() - 1); // remove the last `)`
+                //
                 positiveTestMethods.add(testCls + "#" + testMtd);
             }
             assert !positiveTestMethods.isEmpty();
@@ -75,6 +87,24 @@ public class ReaderLocalizer implements IFaultLocalizer{
             }
             assert !negativeTestMethods.isEmpty();
             positiveTestMethods.removeAll(negativeTestMethods);
+
+            if(subject.equalsIgnoreCase("closure")) {
+                // TODO: only read from d4j base for closure
+                String lower = subject.toLowerCase();
+                String headCapitalized = Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+                String path = ProjectConfig.DEFECTS4J_HOME + "framework/projects/" + headCapitalized +
+                        "/relevant_tests/" + id;
+                Set<String> allRelatedClass = new HashSet<>(FileUtils.readLines(new File(path)));
+                List<String> tobeRemoved = new ArrayList<>(positiveTestMethods.size());
+                for (String positiveTest: positiveTestMethods) {
+                    String cls = positiveTest.split("#")[0];
+                    if (!allRelatedClass.contains(cls)) {
+                        tobeRemoved.add(positiveTest);
+                    }
+                }
+                positiveTestMethods.removeAll(tobeRemoved);
+            }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -104,4 +134,15 @@ public class ReaderLocalizer implements IFaultLocalizer{
         return this.negativeTestMethods;
     }
 
+    public String getSubject() {
+        return subject;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public boolean isManual() {
+        return isManual;
+    }
 }

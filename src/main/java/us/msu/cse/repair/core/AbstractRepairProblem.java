@@ -1,8 +1,6 @@
 package us.msu.cse.repair.core;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -241,7 +239,6 @@ public abstract class AbstractRepairProblem extends Problem {
 		diffFormat = (Boolean) parameters.get("diffFormat");
 		if (diffFormat == null)
 			diffFormat = false;
-		
 
 		testFiltered = (Boolean) parameters.get("testFiltered");
 		if (testFiltered == null)
@@ -318,11 +315,41 @@ public abstract class AbstractRepairProblem extends Problem {
 
 	void invokeFaultLocalizer() throws FileNotFoundException, IOException {
 		System.out.println("Fault localization starts...");
-		IFaultLocalizer faultLocalizer;
+		IFaultLocalizer faultLocalizer = null;
 		if(useGzoltar) {
-			if (gzoltarDataDir == null)
-				faultLocalizer = new GZoltarFaultLocalizer(binJavaClasses, binExecuteTestClasses, binJavaDir, binTestDir,
-						dependences);
+			if (gzoltarDataDir == null) {
+				String cacheFilePath = "tmp/gzoltar/" + subject + "_" + id + ".gzoltar";
+				File tempFile = new File(cacheFilePath);
+				if (tempFile.exists()) {
+					try {
+						// load from cache
+						FileInputStream fileIn = new FileInputStream(tempFile);
+						ObjectInputStream in = new ObjectInputStream(fileIn);
+						faultLocalizer = (GZoltarFaultLocalizer) in.readObject();
+						in.close();
+						fileIn.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				if (faultLocalizer == null) {
+					faultLocalizer = new GZoltarFaultLocalizer(binJavaClasses, binExecuteTestClasses, binJavaDir, binTestDir,
+							dependences);
+					try {
+						// store to cache
+						if (!tempFile.getParentFile().exists()) {
+							tempFile.getParentFile().mkdirs();
+						}
+						FileOutputStream fileOut = new FileOutputStream(tempFile);
+						ObjectOutputStream out = new ObjectOutputStream(fileOut);
+						out.writeObject(faultLocalizer);
+						out.close();
+						fileOut.close();
+					} catch (IOException i) {
+						i.printStackTrace();
+					}
+				}
+			}
 			else {
 				faultLocalizer = new GZoltarFaultLocalizer2(gzoltarDataDir);
 			}
@@ -336,11 +363,14 @@ public abstract class AbstractRepairProblem extends Problem {
 		positiveTests = faultLocalizer.getPositiveTests();
 		negativeTests = faultLocalizer.getNegativeTests();
 
-		if (orgPosTestsInfoPath != null)
+		if (orgPosTestsInfoPath != null) {
+			// write to temp files, for test filer
 			FileUtils.writeLines(new File(orgPosTestsInfoPath), positiveTests);
+		}
 
 		System.out.println("Number of positive tests: " + positiveTests.size());
 		System.out.println("Number of negative tests: " + negativeTests.size());
+		System.out.println("Number of faulty line bigger than suspicious threshold " + thr + ": " + faultyLines.size());
 		System.out.println("Fault localization is finished!");
 	}
 
@@ -479,19 +509,26 @@ public abstract class AbstractRepairProblem extends Problem {
 
 	void invokeTestFilter() throws IOException, InterruptedException {
 		System.out.println("Filtering of the tests starts...");
+		System.out.println("Filter params: testFiltered=" + testFiltered +
+				", maxNumberOfModificationPoints=" + maxNumberOfModificationPoints);
+		System.out.println("Filter params: faultyLines=" + faultyLinesInfoPath);
+		System.out.println("Filter params: finalTestsInfoPath=" + finalTestsInfoPath);
+
 		if (testFiltered) {
 			Set<LCNode> fLines;
 			if (maxNumberOfModificationPoints != null) {
 				fLines = new HashSet<LCNode>();
 				for (ModificationPoint mp : modificationPoints)
 					fLines.add(mp.getLCNode());
-			} else
+			} else {
 				fLines = faultyLines.keySet();
+			}
 
 			if (faultyLinesInfoPath != null) {
 				List<String> lines = new ArrayList<String>();
-				for (LCNode node : fLines)
+				for (LCNode node : fLines) {
 					lines.add(node.toString());
+				}
 				FileUtils.writeLines(new File(faultyLinesInfoPath), lines);
 			}
 

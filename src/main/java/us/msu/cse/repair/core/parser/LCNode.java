@@ -1,6 +1,8 @@
 package us.msu.cse.repair.core.parser;
 
-public class LCNode {
+import java.io.Serializable;
+
+public class LCNode implements Serializable {
 	String className;
 	int lineNumber;
 

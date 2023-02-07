@@ -20,7 +20,7 @@ public class ArjaMain {
 		assert bugID != null;
 		System.out.println("Fixing " + bugID);
 		ProjectConfig config = ProjectConfig.getInstance(bugID);
-		args = new String[11];
+		args = new String[13];
 		args[0] = "Arja";
 		args[1] = "-DsrcJavaDir";
 		args[2] = config.getSrcJavaDir();
@@ -34,6 +34,9 @@ public class ArjaMain {
 		args[9] = "-DpatchOutputRoot";
 		args[10] = "patches_" + bugID;
 
+		args[11] = "-Dthr";
+		args[12] = "0.08";
+
 		HashMap<String, String> parameterStrs = Interpreter.getParameterStrings(args);
 		HashMap<String, Object> parameters = Interpreter.getBasicParameterSetting(parameterStrs);
 
@@ -46,12 +49,12 @@ public class ArjaMain {
 		}
 
 		String ingredientScreenerNameS = parameterStrs.get("ingredientScreenerName");
-		if (ingredientScreenerNameS != null) 
+		if (ingredientScreenerNameS != null) {
 			parameters.put("ingredientScreenerName", ingredientScreenerNameS);
+		}
 
-
-		int populationSize = 80;
-		int maxGenerations = 100;
+		int populationSize = 40;
+		int maxGenerations = 50;
 		
 		String populationSizeS = parameterStrs.get("populationSize");
 		if (populationSizeS != null)
