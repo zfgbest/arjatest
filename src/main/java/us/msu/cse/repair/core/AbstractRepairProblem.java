@@ -509,6 +509,11 @@ public abstract class AbstractRepairProblem extends Problem {
 
 	void invokeTestFilter() throws IOException, InterruptedException {
 		System.out.println("Filtering of the tests starts...");
+        if (subject.equalsIgnoreCase("closure")) {
+            System.out.println("Filter disabled for " + subject);
+            return;
+        }
+
 		System.out.println("Filter params: testFiltered=" + testFiltered +
 				", maxNumberOfModificationPoints=" + maxNumberOfModificationPoints);
 		System.out.println("Filter params: faultyLines=" + faultyLinesInfoPath);
@@ -609,7 +614,6 @@ public abstract class AbstractRepairProblem extends Problem {
 			try {
 				edits.apply(doc);
 			} catch (BadLocationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -670,15 +674,18 @@ public abstract class AbstractRepairProblem extends Problem {
 	}
 
 	protected Set<String> getSamplePositiveTests() {
-		if (percentage == null || percentage == 1)
-			return positiveTests;
-		else {
-			int num = (int) (positiveTests.size() * percentage);
+		if ((percentage == null || percentage == 1) && positiveTests.size() <= 20) {
+            return positiveTests;
+        } else {
+            Double realPercentage = percentage != null ? percentage : (Double.valueOf(20) / positiveTests.size()) ;
+			int num = (int) (positiveTests.size() * realPercentage);
 			List<String> tempList = new ArrayList<String>(positiveTests);
 			Collections.shuffle(tempList);
 			Set<String> samplePositiveTests = new HashSet<String>();
-			for (int i = 0; i < num; i++)
+			for (int i = 0; i < num; i++){
 				samplePositiveTests.add(tempList.get(i));
+            }
+            System.out.println("Sample " + samplePositiveTests.size() + " tests from " + positiveTests.size());
 			return samplePositiveTests;
 		}
 	}

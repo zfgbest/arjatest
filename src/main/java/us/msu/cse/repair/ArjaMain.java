@@ -53,8 +53,8 @@ public class ArjaMain {
 			parameters.put("ingredientScreenerName", ingredientScreenerNameS);
 		}
 
-		int populationSize = 40;
-		int maxGenerations = 50;
+		int populationSize = 80;
+		int maxGenerations = 100;
 		
 		String populationSizeS = parameterStrs.get("populationSize");
 		if (populationSizeS != null)
@@ -64,7 +64,7 @@ public class ArjaMain {
 		if (maxGenerationsS != null)
 			maxGenerations = Integer.parseInt(maxGenerationsS);
 
-		
+		// invoke several modules
 		ArjaProblem problem = new ArjaProblem(parameters);
 		AbstractRepairAlgorithm repairAlg = new Arja(problem);
 

@@ -19,7 +19,6 @@ public abstract class AbstractRepairAlgorithm {
 		try {
 			deleteWorkingDirs();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return solutionSet;

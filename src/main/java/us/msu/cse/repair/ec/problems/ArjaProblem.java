@@ -105,8 +105,7 @@ public class ArjaProblem extends AbstractRepairProblem {
 
 	@Override
 	public void evaluate(Solution solution) throws JMException {
-		// TODO Auto-generated method stub
-		System.out.println("One fitness evaluation starts...");
+		System.out.println(">>>>>>>> One fitness evaluation starts...");
 		
 		int[] array = ((ArrayInt) solution.getDecisionVariables()[0]).array_;
 		BitSet bits = ((Binary) solution.getDecisionVariables()[1]).bits_;
@@ -188,7 +187,7 @@ public class ArjaProblem extends AbstractRepairProblem {
 		}
 
 		evaluations++;
-		System.out.println("One fitness evaluation is finished...");
+		System.out.println(">>>>>>>> One fitness evaluation is finished...\n");
 	}
 
 	void save(Solution solution, Map<String, String> modifiedJavaSources, Map<String, JavaFileObject> compiledClasses,
@@ -258,6 +257,9 @@ public class ArjaProblem extends AbstractRepairProblem {
 			
 			System.out.println("Number of failed tests: "
 					+ (testExecutor.getFailureCountInNegative() + testExecutor.getFailureCountInPositive()));
+
+			System.out.println("Failing tests: " + testExecutor.getFailedTests());
+
 			System.out.println("Weighted failure rate: " + fitness);
 			
 			if (numberOfObjectives == 1 || numberOfObjectives == 2) 
