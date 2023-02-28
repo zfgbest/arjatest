@@ -509,10 +509,10 @@ public abstract class AbstractRepairProblem extends Problem {
 
 	void invokeTestFilter() throws IOException, InterruptedException {
 		System.out.println("Filtering of the tests starts...");
-        if (subject.equalsIgnoreCase("closure")) {
+        /*if (subject.equalsIgnoreCase("closure")) {
             System.out.println("Filter disabled for " + subject);
             return;
-        }
+        }*/
 
 		System.out.println("Filter params: testFiltered=" + testFiltered +
 				", maxNumberOfModificationPoints=" + maxNumberOfModificationPoints);
@@ -548,7 +548,9 @@ public abstract class AbstractRepairProblem extends Problem {
 			finalTests.addAll(negativeTests);
 			FileUtils.writeLines(new File(finalTestsInfoPath), finalTests);
 		}
-		
+		for(String test : positiveTests){
+			System.out.println(test);
+		}
 		System.out.println("Number of positive tests considered: " + positiveTests.size() );
 		System.out.println("Filtering of the tests is finished!");
 	}

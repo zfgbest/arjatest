@@ -34,7 +34,7 @@ public class TestFilter {
 	private static Set<LCNode> faultyLines;
 	private static Set<String> orgPositiveTests;
 	private static Set<String> faultyClasses;
-
+	private static int value;
 	public static void main(String args[]) throws Exception  {
 		binJavaDir = args[0].trim();
 		binTestDir = args[1].trim();
@@ -77,7 +77,7 @@ public class TestFilter {
 			for (String str : pts)
 				orgPositiveTests.add(str);
 		}
-		
+		value = Integer.valueOf(args[5]);
 		List<String> filteredPositiveTests = getFilteredPositiveTests();
 		printFilteredPositiveTests(filteredPositiveTests);
 		System.exit(0);
@@ -91,9 +91,18 @@ public class TestFilter {
 
 	private static List<String> getFilteredPositiveTests() throws Exception {
 		List<String> filteredPositiveTests = new ArrayList<String>();
+		int temp=0;
 		for (String test : orgPositiveTests) {
-			if (!canFiltered(test))
-				filteredPositiveTests.add(test);
+			temp = temp +1;
+			if(temp >= value){
+				if (!canFiltered(test)) {
+					filteredPositiveTests.add(test);
+					System.out.println("Add>>>>>>" + test);
+				}
+			}
+			if(temp >= value+500 || temp > orgPositiveTests.size()){
+				break;
+			}
 		}
 
 		return filteredPositiveTests;

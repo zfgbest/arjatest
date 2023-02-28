@@ -30,6 +30,7 @@ public class ReaderLocalizer implements IFaultLocalizer{
         System.out.println("Loading " + str + " FL data...");
         File suspiciousFile = new File("location/" + str + "/" + subject + "/" + id + ".txt");
         assert suspiciousFile.exists(): "FILE DOES NOT EXIST: " + suspiciousFile.getAbsolutePath();
+        //fht : get faultyLines
         try {
             List<String> lines = FileUtils.readLines(suspiciousFile);
             faultyLines = new HashMap<LCNode, Double>();
@@ -52,7 +53,8 @@ public class ReaderLocalizer implements IFaultLocalizer{
 
         File allTestFile;
         if (System.getProperty("os.name").toLowerCase().contains("linux")) {
-            allTestFile = new File(rootDir + "/all-tests.txt");
+            //allTestFile = new File(rootDir + "/all-tests.txt");
+            allTestFile = new File(rootDir + "/all_tests");
         } else {
             allTestFile = new File(rootDir + "/all_tests");
         }

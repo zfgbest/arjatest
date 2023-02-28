@@ -56,7 +56,7 @@ public class TestFilterProcess {
 		List<String> params = new ArrayList<String>();
 		params.add(jvmPath);
 		params.add("-XX:PermSize=256M");
-		params.add("-XX:MaxPermSize=2G");
+		params.add("-XX:MaxPermSize=6G");
 
 		params.add("-cp");
 
@@ -118,7 +118,7 @@ public class TestFilterProcess {
 		}
 		System.out.println("\n------------------------------");
 
-		ProcessBuilder builder = new ProcessBuilder(params);
+		/*ProcessBuilder builder = new ProcessBuilder(params);
 		builder.redirectOutput();
 		builder.redirectErrorStream(true);
 		builder.directory();
@@ -133,14 +133,38 @@ public class TestFilterProcess {
 		processWithTimeout.waitForProcess(0);
 
 		streamReaderThread.join();
-		List<String> output = streamReaderThread.getOutput();
+		List<String> output = streamReaderThread.getOutput();*/
 
 		Set<String> filteredPositiveTests = new HashSet<String>();
-		for (String str : output) {
+		/*for (String str : output) {
 			if (str.startsWith("FilteredTest"))
 				filteredPositiveTests.add(str.split(":")[1].trim());
-		}
+		}*/
 
+		for(int i= 0; i < orgPositiveTests.size(); i = i + 500){
+			params.add(String.valueOf(i));
+			ProcessBuilder builder = new ProcessBuilder(params);
+			builder.redirectOutput();
+			builder.redirectErrorStream(true);
+			builder.directory();
+			builder.environment().put("TZ", "America/Los_Angeles");
+
+			Process process = builder.start();
+
+			StreamReaderThread streamReaderThread = new StreamReaderThread(process.getInputStream());
+			streamReaderThread.start();
+
+			ProcessWithTimeout processWithTimeout = new ProcessWithTimeout(process);
+			processWithTimeout.waitForProcess(0);
+
+			streamReaderThread.join();
+			List<String> output = streamReaderThread.getOutput();
+			for (String str : output) {
+				if (str.startsWith("FilteredTest"))
+					filteredPositiveTests.add(str.split(":")[1].trim());
+			}
+			params.remove(params.size()-1);
+		}
 		return filteredPositiveTests;
 	}
 
